@@ -14,12 +14,14 @@ theme_params = {
         'text_color': '#cccccc',
         'input_text_color': '#cccccc',
         'input_focus_color': '#00bcd4',
+        'background_color': '#263238',
         'icon_name': 'fa5s.moon',
     },
     'light_cyan_500': {
         'text_color': '#212121',
         'input_text_color': '#212121',
         'input_focus_color': '#00bcd4',
+        'background_color': '#f5f5f5',  # <--- добавлено
         'icon_name': 'fa5s.sun',
     },
 }
@@ -52,27 +54,63 @@ def _apply(name):
 def _append_input_styles():
     app = QApplication.instance()
     p = theme_params[current_theme]
+    bg = p['background_color']
+    focus = p['input_focus_color']
+    text = p['text_color']
     qss = f"""
+        /* Фоновый цвет для главных виджетов */
+        QWidget, QMainWindow {{
+            background-color: {bg};
+        }}
+        QDialog, QMenuBar, QMenu, QStatusBar {{
+            background-color: {bg};
+        }}
+
+        /* Текстовые поля и комбобоксы */
         QLineEdit, QDateEdit, QTimeEdit, QComboBox {{
             color: {p['input_text_color']};
         }}
         QLineEdit:focus, QDateEdit:focus, QTimeEdit:focus, QComboBox:focus {{
-            color: {p['input_focus_color']};
+            color: {focus};
+            border: 1px solid {focus};
+            border-radius: 4px;
         }}
         QLineEdit::placeholder {{ color: #888888; }}
         QComboBox QAbstractItemView {{
-            color: {p['text_color']};
-            background-color: transparent;
-            selection-background-color: {p['input_focus_color']};
+            color: {text};
+            background-color: {bg};
+            selection-background-color: {focus};
             selection-color: #ffffff;
         }}
+
+        /* SpinBox */
         QSpinBox, QDoubleSpinBox {{
             color: {p['input_text_color']};
         }}
         QSpinBox:focus, QDoubleSpinBox:focus {{
-            color: {p['input_focus_color']};
-            border: 1px solid {p['input_focus_color']};
+            color: {focus};
+            border: 1px solid {focus};
             border-radius: 4px;
+        }}
+
+        /* Кнопки */
+        QPushButton, QToolButton {{
+            color: {text};
+            background-color: transparent;
+            border: 1px solid {text};
+            border-radius: 6px;
+            padding: 4px 8px;
+        }}
+        QPushButton:hover, QToolButton:hover {{
+            border-color: {focus};
+            background-color: rgba(0, 0, 0, 0.2);
+        }}
+        QPushButton:pressed, QToolButton:pressed {{
+            background-color: rgba(0, 0, 0, 0.3);
+        }}
+        QPushButton:focus, QToolButton:focus {{
+            outline: none;
+            border: 1px solid {focus};
         }}
     """
     app.setStyleSheet(app.styleSheet() + qss)
